@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PC Explorer - Interactive Hardware Architecture & Blueprint</title>
     <meta name="description" content="Explore and understand computer hardware through interactive 2.5D blueprints, tactile connection mechanics, and intuitive real-world mental models." />
+    <script>
+      // When served statically on GitHub Pages without Vite dev server, route to the self-contained standalone bundle
+      if (
+        typeof window !== 'undefined' &&
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1' &&
+        !window.location.hostname.endsWith('.local')
+      ) {
+        var base = window.location.pathname.endsWith('/')
+          ? window.location.pathname
+          : window.location.pathname.replace(/\/[^/]*$/, '/');
+        window.location.replace(base + 'standalone/');
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

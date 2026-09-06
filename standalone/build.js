@@ -63,6 +63,26 @@ ${safeJsContent}
 
 fs.writeFileSync(standaloneHtmlPath, html, 'utf8');
 
+// 5. Also sync to docs/ directory for direct GitHub Pages branch deployment (/docs folder)
+const docsDir = path.join(rootDir, 'docs');
+if (!fs.existsSync(docsDir)) {
+  fs.mkdirSync(docsDir, { recursive: true });
+}
+const docsHtmlPath = path.join(docsDir, 'index.html');
+fs.writeFileSync(docsHtmlPath, html, 'utf8');
+
+// 6. Ensure .nojekyll exists in root and docs/ to disable Jekyll processing on GitHub Pages
+const rootNoJekyll = path.join(rootDir, '.nojekyll');
+if (!fs.existsSync(rootNoJekyll)) {
+  fs.writeFileSync(rootNoJekyll, '', 'utf8');
+}
+const docsNoJekyll = path.join(docsDir, '.nojekyll');
+if (!fs.existsSync(docsNoJekyll)) {
+  fs.writeFileSync(docsNoJekyll, '', 'utf8');
+}
+
 const stats = fs.statSync(standaloneHtmlPath);
 console.log(`[Success] Standalone bundle created at: ${standaloneHtmlPath}`);
+console.log(`[Success] GitHub Pages docs bundle created at: ${docsHtmlPath}`);
 console.log(`Total self-contained single-file size: ${(stats.size / 1024).toFixed(1)} KB`);
+

@@ -177,15 +177,31 @@ The preview server will be accessible at `http://localhost:4173/`.
 **Does this website need a backend? No!** The entire PC Explorer application is 100% client-side. There are no backend servers, databases, or API microservices required. The `npm run dev` command is simply Vite's local development server for hot-reloading.
 
 For completely standalone, offline, or zero-install usage:
-- A dedicated **single-file standalone distribution** is available in [`standalone/index.html`](file:///home/q/Projects/pc_part_exp/standalone/index.html).
+- A dedicated **single-file standalone distribution** is compiled into both [`standalone/index.html`](file:///home/q/Projects/pc_part_exp/standalone/index.html) and [`docs/index.html`](file:///home/q/Projects/pc_part_exp/docs/index.html).
 - **Direct Double-Click:** You can double-click `standalone/index.html` directly in your file browser (opening via `file:///` protocol) without running Node.js, Vite, or any terminal command.
 - All styles, SVGs, sound synthesizers, and scripts are bundled into that single HTML file with zero CORS restrictions and zero external network calls.
+
+#### Deploying to GitHub Pages
+
+You can host PC Explorer on GitHub Pages in any of three seamless ways:
+
+1. **Option 1: Automated GitHub Actions (Recommended)**
+   - Go to your repository on GitHub: **Settings > Pages**.
+   - Under **Build and deployment > Source**, select **GitHub Actions**.
+   - The included [`.github/workflows/deploy.yml`](file:///home/q/Projects/pc_part_exp/.github/workflows/deploy.yml) will automatically compile and deploy the standalone bundle on every push to `main`.
+2. **Option 2: Deploy from Branch via `/docs`**
+   - Go to **Settings > Pages**.
+   - Under **Build and deployment > Source**, select **Deploy from a branch**.
+   - Select Branch: `main`, Folder: **`/docs`**, then click **Save**.
+   - GitHub Pages directly serves the standalone bundle at `https://<username>.github.io/pc_explorer/`.
+3. **Option 3: Deploy from Branch via Root (`/`)**
+   - If deploying from Branch: `main`, Folder: `/ (root)`, the root [`index.html`](file:///home/q/Projects/pc_part_exp/index.html) includes a smart static routing bridge that seamlessly routes web traffic to the standalone bundle while keeping local `npm run dev` and `npm run build` completely intact.
 
 To recompile the standalone distribution after modifying code:
 ```bash
 npm run build:standalone
 ```
-See [`standalone/README.md`](file:///home/q/Projects/pc_part_exp/standalone/README.md) for full architectural details and lightweight framework discussion.
+See [`standalone/README.md`](file:///home/q/Projects/pc_part_exp/standalone/README.md) and [`docs/README.md`](file:///home/q/Projects/pc_part_exp/docs/README.md) for full architectural details.
 
 ---
 
