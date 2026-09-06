@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { PartId, SocketZone, Language } from '../../types';
 import { MOTHERBOARD_WIDTH, MOTHERBOARD_HEIGHT } from '../../data/motherboardData';
 import { getMotherboardZones, getPartsData, getUI } from '../../content';
@@ -12,6 +12,9 @@ interface MotherboardCanvasProps {
   isPopulated: boolean;
   setIsPopulated: (val: boolean | ((prev: boolean) => boolean)) => void;
   lang: Language;
+  canvasHeight?: number;
+  canvasAspectRatio?: string;
+  ratioLabel?: string;
 }
 
 export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
@@ -21,7 +24,10 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
   setActiveLayer,
   isPopulated,
   setIsPopulated,
-  lang
+  lang,
+  canvasHeight,
+  canvasAspectRatio,
+  ratioLabel
 }) => {
   const t = getUI(lang);
   const parts = getPartsData(lang);
@@ -34,11 +40,41 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
   const [hoveredZone, setHoveredZone] = useState<SocketZone | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasUserAdjustedRef = useRef(false);
+
+  // Auto-fit zoom computation based on dynamic container dimensions and aspect ratio
+  const computeFitZoom = useCallback((containerW: number, containerH: number) => {
+    // 48px lateral breathing margin, 78px top toolbar clearance
+    const availW = Math.max(containerW - 48, 200);
+    const availH = Math.max(containerH - 78, 200);
+    const fitW = availW / MOTHERBOARD_WIDTH;
+    const fitH = availH / MOTHERBOARD_HEIGHT;
+    return Math.min(fitW, fitH, 1.4);
+  }, []);
+
+  // Responsive observer: dynamically recalibrates zoom when container aspect ratio or size shifts
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        if (width > 0 && height > 0 && !hasUserAdjustedRef.current) {
+          const fit = computeFitZoom(width, height);
+          setZoom(Math.max(0.35, Number(fit.toFixed(2))));
+        }
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [computeFitZoom]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     // Only drag if left click on canvas background
     if (e.button === 0) {
       setIsDragging(true);
+      hasUserAdjustedRef.current = true;
       setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
     }
   };
@@ -56,9 +92,23 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
     setIsDragging(false);
   };
 
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    hasUserAdjustedRef.current = true;
+    const delta = e.deltaY < 0 ? 0.08 : -0.08;
+    setZoom(z => Math.max(0.4, Math.min(2.5, Number((z + delta).toFixed(2)))));
+  };
+
   const resetView = () => {
-    setZoom(1);
+    hasUserAdjustedRef.current = false;
     setPan({ x: 0, y: 0 });
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const fit = computeFitZoom(rect.width, rect.height);
+      setZoom(Math.max(0.35, Number(fit.toFixed(2))));
+    } else {
+      setZoom(1);
+    }
   };
 
   // Filter socket zones based on active layer
@@ -72,7 +122,15 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
   });
 
   return (
-    <div className="relative w-full h-[620px] lg:h-[750px] bg-slate-950 rounded-2xl border border-slate-800/80 overflow-hidden select-none shadow-2xl flex flex-col">
+    <div
+      className="relative w-full bg-slate-950 rounded-2xl border border-slate-800/80 overflow-hidden select-none shadow-2xl flex flex-col transition-[height] duration-200"
+      style={{
+        height: canvasHeight ? `${canvasHeight}px` : undefined,
+        aspectRatio: canvasAspectRatio || undefined,
+        minHeight: '440px',
+        maxHeight: 'min(calc(100vh - 180px), 920px)'
+      }}
+    >
       {/* Canvas Header Controls */}
       <div className="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Layer Filters */}
@@ -146,8 +204,19 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
           </button>
 
           <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700 shadow-lg text-slate-300">
+            {ratioLabel && (
+              <span
+                className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800/90 text-cyan-400 border border-slate-700/80 mr-1 hidden sm:inline-block select-none font-semibold"
+                title="Dynamic Aspect Ratio (adapts automatically to window size & aspect ratio)"
+              >
+                AR {ratioLabel}
+              </span>
+            )}
             <button
-              onClick={() => setZoom(z => Math.min(z + 0.2, 2.5))}
+              onClick={() => {
+                hasUserAdjustedRef.current = true;
+                setZoom(z => Math.min(Number((z + 0.15).toFixed(2)), 2.5));
+              }}
               className="p-1.5 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
               title={t.boardControls.zoomIn}
             >
@@ -157,7 +226,10 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
               {Math.round(zoom * 100)}%
             </span>
             <button
-              onClick={() => setZoom(z => Math.max(z - 0.2, 0.6))}
+              onClick={() => {
+                hasUserAdjustedRef.current = true;
+                setZoom(z => Math.max(Number((z - 0.15).toFixed(2)), 0.35));
+              }}
               className="p-1.5 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
               title={t.boardControls.zoomOut}
             >
@@ -181,6 +253,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
         className={`flex-1 w-full h-full flex items-center justify-center cursor-${
           isDragging ? 'grabbing' : 'grab'
         } overflow-hidden`}

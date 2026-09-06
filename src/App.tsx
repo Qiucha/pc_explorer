@@ -7,6 +7,7 @@ import { PartInspector } from './components/inspector/PartInspector';
 import { PartTray } from './components/common/PartTray';
 import { WiringLab } from './components/wiring/WiringLab';
 import { AssemblySimulator } from './components/assembly/AssemblySimulator';
+import { useWindowDimensions } from './hooks/useWindowDimensions';
 
 export const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>('anatomy');
@@ -15,6 +16,15 @@ export const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('en');
   const [activeLayer, setActiveLayer] = useState<string>('all');
   const [isPopulated, setIsPopulated] = useState<boolean>(false);
+
+  const {
+    canvasHeight,
+    dynamicRatioStr,
+    ratioLabel,
+    inspectorHeight,
+    isPortrait,
+    isUltraWide
+  } = useWindowDimensions();
 
   const t = getUI(lang);
 
@@ -31,11 +41,11 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-6">
+      <main className="flex-1 w-full max-w-[1920px] 2xl:max-w-[2400px] mx-auto px-3 sm:px-5 lg:px-6 py-3.5 md:py-4 space-y-4 md:space-y-5">
         {mode === 'anatomy' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
             {/* Interactive Vector Motherboard & Component Tray */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className={`${isUltraWide ? 'lg:col-span-7 xl:col-span-7 2xl:col-span-8' : 'lg:col-span-7'} flex flex-col gap-3.5`}>
               <MotherboardCanvas
                 selectedPartId={selectedPartId}
                 onSelectPart={setSelectedPartId}
@@ -44,6 +54,9 @@ export const App: React.FC = () => {
                 isPopulated={isPopulated}
                 setIsPopulated={setIsPopulated}
                 lang={lang}
+                canvasHeight={canvasHeight}
+                canvasAspectRatio={dynamicRatioStr}
+                ratioLabel={ratioLabel}
               />
               <PartTray
                 selectedPartId={selectedPartId}
@@ -53,7 +66,13 @@ export const App: React.FC = () => {
             </div>
 
             {/* Part Inspector & Analogy Drawer */}
-            <div className="lg:col-span-5 h-[620px] lg:h-[830px]">
+            <div
+              className={`${isUltraWide ? 'lg:col-span-5 xl:col-span-5 2xl:col-span-4' : 'lg:col-span-5'} flex flex-col`}
+              style={{
+                minHeight: isPortrait ? '520px' : undefined,
+                height: isPortrait ? undefined : `${inspectorHeight}px`
+              }}
+            >
               <PartInspector
                 partId={selectedPartId}
                 metaphor={metaphor}
@@ -73,8 +92,8 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950/80 py-4 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <footer className="border-t border-slate-800/80 bg-slate-950/80 py-3 px-3 sm:px-5 lg:px-6 text-center text-xs text-slate-500">
+        <div className="w-full max-w-[1920px] 2xl:max-w-[2400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>{t.footerTitle}</span>
           <span className="font-mono text-slate-600 text-[11px]">
             {t.footerSubtitle}
