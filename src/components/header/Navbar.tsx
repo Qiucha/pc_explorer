@@ -1,6 +1,6 @@
 import React from 'react';
 import type { AppMode, MetaphorType, Language } from '../../types';
-import { getTranslation } from '../../i18n';
+import { getUI } from '../../content';
 import { Cpu, Zap, Hammer, Layers, Globe, ChefHat, FileText, Factory } from 'lucide-react';
 
 interface NavbarProps {
@@ -20,7 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   lang,
   setLang
 }) => {
-  const t = getTranslation(lang);
+  const t = getUI(lang);
 
   return (
     <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 px-4 lg:px-8 py-3">
@@ -135,10 +135,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
-            title="Toggle Language / 切换语言"
+            title="Toggle Language / 切換語言"
           >
             <Globe className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{lang === 'en' ? '中文' : 'EN'}</span>
+            <span>{lang === 'en' ? '繁體中文' : 'English'}</span>
           </button>
         </div>
       </div>

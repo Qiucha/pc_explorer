@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { PartId, MetaphorType, AppMode, Language } from './types';
+import { getUI } from './content';
 import { Navbar } from './components/header/Navbar';
 import { MotherboardCanvas } from './components/board/MotherboardCanvas';
 import { PartInspector } from './components/inspector/PartInspector';
@@ -14,6 +15,8 @@ export const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('en');
   const [activeLayer, setActiveLayer] = useState<string>('all');
   const [isPopulated, setIsPopulated] = useState<boolean>(false);
+
+  const t = getUI(lang);
 
   return (
     <div className="min-h-screen bg-[#070b12] text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-white">
@@ -40,10 +43,12 @@ export const App: React.FC = () => {
                 setActiveLayer={setActiveLayer}
                 isPopulated={isPopulated}
                 setIsPopulated={setIsPopulated}
+                lang={lang}
               />
               <PartTray
                 selectedPartId={selectedPartId}
                 onSelectPart={setSelectedPartId}
+                lang={lang}
               />
             </div>
 
@@ -70,9 +75,9 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950/80 py-4 px-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>PC Explorer &bull; Interactive Hardware Architecture &amp; Blueprint</span>
+          <span>{t.footerTitle}</span>
           <span className="font-mono text-slate-600 text-[11px]">
-            Engineered with React 19 &bull; High-Precision 2.5D SVG Canvas &bull; Zero 3D Bloat
+            {t.footerSubtitle}
           </span>
         </div>
       </footer>

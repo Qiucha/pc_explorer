@@ -1,6 +1,6 @@
 import React from 'react';
-import type { PartId } from '../../types';
-import { partsData } from '../../data/partsData';
+import type { PartId, Language } from '../../types';
+import { getPartsData, getUI } from '../../content';
 import {
   Cpu,
   Fan,
@@ -15,6 +15,7 @@ import {
 interface PartTrayProps {
   selectedPartId: PartId;
   onSelectPart: (id: PartId) => void;
+  lang: Language;
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -28,8 +29,10 @@ const iconMap: Record<string, React.ElementType> = {
   case_fans: Wind
 };
 
-export const PartTray: React.FC<PartTrayProps> = ({ selectedPartId, onSelectPart }) => {
-  const partsList = Object.values(partsData);
+export const PartTray: React.FC<PartTrayProps> = ({ selectedPartId, onSelectPart, lang }) => {
+  const parts = getPartsData(lang);
+  const partsList = Object.values(parts);
+  const t = getUI(lang);
 
   return (
     <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-2.5 shadow-xl">
@@ -63,10 +66,10 @@ export const PartTray: React.FC<PartTrayProps> = ({ selectedPartId, onSelectPart
 
               <div className="text-left">
                 <div className="text-xs font-semibold leading-tight text-white">
-                  {part.name.split(' (')[0]}
+                  {part.name.split(/[（(]/)[0].trim() || part.name}
                 </div>
-                <div className="text-[10px] text-slate-400 font-mono capitalize">
-                  {part.category}
+                <div className="text-[10px] text-slate-400 font-mono">
+                  {t.categories[part.category] || part.category}
                 </div>
               </div>
             </button>

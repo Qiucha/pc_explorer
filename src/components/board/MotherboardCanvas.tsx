@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
-import type { PartId, SocketZone } from '../../types';
-import { MOTHERBOARD_WIDTH, MOTHERBOARD_HEIGHT, motherboardZones } from '../../data/motherboardData';
-import { partsData } from '../../data/partsData';
+import type { PartId, SocketZone, Language } from '../../types';
+import { MOTHERBOARD_WIDTH, MOTHERBOARD_HEIGHT } from '../../data/motherboardData';
+import { getMotherboardZones, getPartsData, getUI } from '../../content';
 import { ZoomIn, ZoomOut, RotateCcw, Eye, Layers } from 'lucide-react';
 
 interface MotherboardCanvasProps {
@@ -11,6 +11,7 @@ interface MotherboardCanvasProps {
   setActiveLayer: (layer: string) => void;
   isPopulated: boolean;
   setIsPopulated: (val: boolean | ((prev: boolean) => boolean)) => void;
+  lang: Language;
 }
 
 export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
@@ -19,8 +20,13 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
   activeLayer,
   setActiveLayer,
   isPopulated,
-  setIsPopulated
+  setIsPopulated,
+  lang
 }) => {
+  const t = getUI(lang);
+  const parts = getPartsData(lang);
+  const zones = getMotherboardZones(lang);
+
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -56,7 +62,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
   };
 
   // Filter socket zones based on active layer
-  const filteredZones = motherboardZones.filter(zone => {
+  const filteredZones = zones.filter(zone => {
     if (activeLayer === 'all') return true;
     if (activeLayer === 'power' && zone.layer === 'power') return true;
     if (activeLayer === 'data' && (zone.layer === 'processing' || zone.layer === 'memory' || zone.layer === 'expansion' || zone.layer === 'storage')) return true;
@@ -80,7 +86,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            All
+            {t.boardControls.allLayers}
           </button>
           <button
             onClick={() => setActiveLayer('power')}
@@ -90,7 +96,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            ⚡ Power
+            {t.boardControls.powerLayer}
           </button>
           <button
             onClick={() => setActiveLayer('data')}
@@ -100,7 +106,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            🔗 Data/PCIe
+            {t.boardControls.dataLayer}
           </button>
           <button
             onClick={() => setActiveLayer('cooling')}
@@ -110,7 +116,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            ❄️ Cooling
+            {t.boardControls.coolingLayer}
           </button>
           <button
             onClick={() => setActiveLayer('io')}
@@ -120,7 +126,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            🔌 I/O
+            {t.boardControls.ioLayer}
           </button>
         </div>
 
@@ -133,17 +139,17 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
                 ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-500/20'
                 : 'bg-slate-900/90 text-slate-300 border-slate-700 hover:bg-slate-800'
             }`}
-            title="Toggle between bare motherboard and fully populated components"
+            title={t.boardControls.xrayTitle}
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>{isPopulated ? 'Armored (X-Ray On)' : 'Bare PCB'}</span>
+            <span>{isPopulated ? t.boardControls.xrayArmored : t.boardControls.xrayBare}</span>
           </button>
 
           <div className="flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700 shadow-lg text-slate-300">
             <button
               onClick={() => setZoom(z => Math.min(z + 0.2, 2.5))}
               className="p-1.5 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Zoom In"
+              title={t.boardControls.zoomIn}
             >
               <ZoomIn className="w-4 h-4" />
             </button>
@@ -153,14 +159,14 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
             <button
               onClick={() => setZoom(z => Math.max(z - 0.2, 0.6))}
               className="p-1.5 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Zoom Out"
+              title={t.boardControls.zoomOut}
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <button
               onClick={resetView}
               className="p-1.5 hover:text-white hover:bg-slate-800 rounded-lg transition-colors ml-1 border-l border-slate-800"
-              title="Reset View"
+              title={t.boardControls.reset}
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -487,7 +493,7 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
             {filteredZones.map(zone => {
               const isSelected = zone.partId === selectedPartId;
               const isHovered = hoveredZone?.id === zone.id;
-              const partColor = partsData[zone.partId]?.color || '#38bdf8';
+              const partColor = parts[zone.partId]?.color || '#38bdf8';
 
               return (
                 <g
@@ -531,18 +537,16 @@ export const MotherboardCanvas: React.FC<MotherboardCanvasProps> = ({
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           {hoveredZone ? (
             <span className="text-slate-200 font-mono">
-              Hovering: <strong className="text-cyan-400">{hoveredZone.name}</strong> ({hoveredZone.sublabel})
+              {t.boardControls.hoverPrefix} <strong className="text-cyan-400">{hoveredZone.name}</strong> ({hoveredZone.sublabel})
             </span>
           ) : (
             <span className="truncate">
-              Click any socket, RAM channel, PCIe slot, or power header to inspect.
+              {t.boardControls.hoverPrompt}
             </span>
           )}
         </div>
         <div className="hidden sm:flex items-center gap-3 text-[11px] text-slate-500 font-mono">
-          <span>Standard ATX 305x244mm</span>
-          <span>•</span>
-          <span>PCIe 5.0 Ready</span>
+          <span>{t.boardControls.specsBadge}</span>
         </div>
       </div>
     </div>

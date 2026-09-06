@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { cableRoutes, frontPanelPins } from '../../data/wiringData';
-import type { FrontPanelPin } from '../../data/wiringData';
-import type { Language } from '../../types';
-import { getTranslation } from '../../i18n';
+import type { FrontPanelPin, Language } from '../../types';
+import { getCableRoutes, getFrontPanelPins, getUI } from '../../content';
 import {
   Zap,
   CheckCircle,
@@ -20,7 +18,9 @@ export const WiringLab: React.FC<WiringLabProps> = ({ lang }) => {
   const [hoveredPin, setHoveredPin] = useState<FrontPanelPin | null>(null);
   const [selectedPin, setSelectedPin] = useState<FrontPanelPin | null>(null);
 
-  const t = getTranslation(lang);
+  const t = getUI(lang);
+  const cableRoutes = getCableRoutes(lang);
+  const frontPanelPins = getFrontPanelPins(lang);
   const activeCable = cableRoutes.find(c => c.id === selectedCableId) || cableRoutes[0];
 
   return (
@@ -242,7 +242,7 @@ export const WiringLab: React.FC<WiringLabProps> = ({ lang }) => {
                 </div>
               ) : (
                 <div className="text-slate-500 italic">
-                  Hover or click any front panel pin to decode its signal and polarity.
+                  {t.wiring.frontPanelHint}
                 </div>
               )}
             </div>
@@ -291,7 +291,7 @@ export const WiringLab: React.FC<WiringLabProps> = ({ lang }) => {
         {/* Detailed Cable Breakdown */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-2xl space-y-4 text-xs">
           <div className="border-b border-slate-800 pb-3">
-            <span className="text-[10px] uppercase font-mono text-cyan-400">HARNESS PROFILE</span>
+            <span className="text-[10px] uppercase font-mono text-cyan-400">{t.wiring.harnessProfile}</span>
             <h3 className="text-sm font-bold text-white mt-0.5">{activeCable.name}</h3>
           </div>
 
@@ -321,7 +321,7 @@ export const WiringLab: React.FC<WiringLabProps> = ({ lang }) => {
           <div className="bg-rose-950/40 border border-rose-800/60 p-3 rounded-xl text-rose-200">
             <h4 className="text-[11px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-rose-400">
               <ShieldAlert className="w-3.5 h-3.5" />
-              Critical Wiring Trap
+              {t.wiring.criticalTrap}
             </h4>
             <p className="text-slate-300 leading-relaxed">
               {activeCable.gotcha}
@@ -332,10 +332,10 @@ export const WiringLab: React.FC<WiringLabProps> = ({ lang }) => {
           <div className="bg-amber-950/40 border border-amber-800/60 p-3 rounded-xl text-amber-200">
             <h4 className="text-[11px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-amber-400">
               <AlertTriangle className="w-3.5 h-3.5" />
-              Never Mix Modular PSU Cables!
+              {t.wiring.modularWarningTitle}
             </h4>
             <p className="text-slate-300 leading-relaxed text-[11px]">
-              PSU-side socket shapes are NOT standardized. Corsair cables on an EVGA or Seasonic PSU will invert 12V and ground, destroying motherboards and SSDs within milliseconds.
+              {t.wiring.modularWarningDesc}
             </p>
           </div>
         </div>

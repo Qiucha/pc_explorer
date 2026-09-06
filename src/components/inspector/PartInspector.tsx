@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import type { PartId, MetaphorType, Language } from '../../types';
-import { partsData } from '../../data/partsData';
-import { getTranslation } from '../../i18n';
+import { getPartsData, getUI } from '../../content';
 import { PartShapeCard } from './PartShapeCard';
 import {
   Sparkles,
@@ -23,8 +22,9 @@ interface PartInspectorProps {
 
 export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, lang }) => {
   const [activeTab, setActiveTab] = useState<'anatomy' | 'analogy' | 'connections' | 'gotchas'>('anatomy');
-  const t = getTranslation(lang);
-  const part = partsData[partId] || partsData.cpu;
+  const t = getUI(lang);
+  const parts = getPartsData(lang);
+  const part = parts[partId] || parts.cpu;
   const currentAnalogy = part.analogies[metaphor];
 
   return (
@@ -52,7 +52,7 @@ export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, 
             border: `1px solid ${part.color}40`
           }}
         >
-          {part.category}
+          {t.categories[part.category] || part.category}
         </span>
       </div>
 
@@ -109,7 +109,7 @@ export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, 
           <div>
             <h3 className="text-xs uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5 mb-1.5">
               <Info className="w-3.5 h-3.5 text-cyan-400" />
-              Physical Anatomy
+              {t.inspector.physicalAnatomyTitle}
             </h3>
             <p className="leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-slate-800 text-slate-300">
               {part.shapeDescription}
@@ -175,7 +175,7 @@ export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, 
             </div>
 
             <div className="mt-2 py-1.5 px-2.5 rounded bg-amber-950/40 border border-amber-800/40 text-amber-200 text-xs font-medium">
-              Role: {currentAnalogy.role}
+              {t.inspector.roleLabel} {currentAnalogy.role}
             </div>
 
             <p className="text-slate-300 leading-relaxed mt-3 text-xs">
@@ -186,7 +186,7 @@ export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, 
           <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
             <h4 className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
               <Link className="w-3.5 h-3.5" />
-              Data & Functional Flow
+              {t.inspector.dataFlowTitle}
             </h4>
             <p className="text-slate-300 leading-relaxed">
               {currentAnalogy.dataMovement}
@@ -216,18 +216,18 @@ export const PartInspector: React.FC<PartInspectorProps> = ({ partId, metaphor, 
               </div>
 
               <div className="text-slate-400 text-[11px]">
-                <strong className="text-slate-300">Mechanism:</strong> {conn.cableOrSlot}
+                <strong className="text-slate-300">{t.inspector.mechanismLabel}</strong> {conn.cableOrSlot}
               </div>
 
               <div className="flex items-start gap-1.5 bg-slate-900/80 p-2 rounded-lg text-emerald-300 border border-slate-800">
                 <Volume2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                 <span className="text-[11px] leading-tight">
-                  <strong className="text-white">Tactile:</strong> {conn.tactileFeedback}
+                  <strong className="text-white">{t.inspector.tactileLabel}</strong> {conn.tactileFeedback}
                 </span>
               </div>
 
               <p className="text-[11px] text-slate-400 italic">
-                Note: {conn.note}
+                <strong className="text-slate-300">{t.inspector.noteLabel}</strong> {conn.note}
               </p>
             </div>
           ))}

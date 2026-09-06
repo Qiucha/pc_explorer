@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { assemblySteps, diagnosticCases } from '../../data/assemblyData';
-import type { DiagnosticCase } from '../../data/assemblyData';
-import { partsData } from '../../data/partsData';
-import type { Language } from '../../types';
-import { getTranslation } from '../../i18n';
+import type { DiagnosticCase, Language } from '../../types';
+import { getAssemblySteps, getDiagnosticCases, getPartsData, getUI } from '../../content';
 import confetti from 'canvas-confetti';
 import {
   CheckCircle2,
@@ -29,9 +26,12 @@ export const AssemblySimulator: React.FC<AssemblySimulatorProps> = ({ lang }) =>
   const [isSeating, setIsSeating] = useState(false);
   const [selectedDiag, setSelectedDiag] = useState<DiagnosticCase | null>(null);
 
-  const t = getTranslation(lang);
+  const t = getUI(lang);
+  const assemblySteps = getAssemblySteps(lang);
+  const diagnosticCases = getDiagnosticCases(lang);
+  const parts = getPartsData(lang);
   const currentStep = assemblySteps[currentStepIndex];
-  const part = partsData[currentStep.partId];
+  const part = parts[currentStep.partId] || parts.cpu;
   const isCurrentCompleted = completedSteps.includes(currentStep.step);
   const isAllCompleted = completedSteps.length === assemblySteps.length;
 
@@ -128,7 +128,7 @@ export const AssemblySimulator: React.FC<AssemblySimulatorProps> = ({ lang }) =>
                 >
                   <div className="text-[10px] font-mono font-bold">STEP {s.step}</div>
                   <div className="text-[9px] truncate mt-0.5">
-                    {partsData[s.partId]?.name.split(' ')[0]}
+                    {parts[s.partId]?.name.split(/[（( ]/)[0].trim() || parts[s.partId]?.name}
                   </div>
                 </button>
               );
@@ -200,7 +200,7 @@ export const AssemblySimulator: React.FC<AssemblySimulatorProps> = ({ lang }) =>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
                 <Volume2 className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Audio Cue: <strong>{currentStep.audioFeedback}</strong></span>
+                <span>{t.assembly.audioCueLabel} <strong>{currentStep.audioFeedback}</strong></span>
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -220,7 +220,7 @@ export const AssemblySimulator: React.FC<AssemblySimulatorProps> = ({ lang }) =>
                     {isCurrentCompleted
                       ? t.assembly.installedSuccess
                       : isSeating
-                      ? 'Seating & Latching...'
+                      ? t.assembly.seatingInProgress
                       : t.assembly.installButton}
                   </span>
                 </button>
