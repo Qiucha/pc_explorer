@@ -80,6 +80,7 @@ export interface SocketZone {
 export interface CablePath {
   id: string;
   name: string;
+  category: 'power' | 'data';
   partId: PartId;
   fromName: string;
   toName: string;
@@ -89,6 +90,22 @@ export interface CablePath {
   svgPath: string;
   keyingRule: string;
   gotcha: string;
+}
+
+export interface MotherboardDataFlow {
+  id: string;
+  name: string;
+  fromName: string;
+  toName: string;
+  busType: string;
+  bandwidth: string;
+  latency: string;
+  color: string;
+  svgPath: string;
+  directCpu: boolean;
+  purpose: string;
+  whyItMatters: string;
+  commonTrap: string;
 }
 
 export interface AssemblyStep {

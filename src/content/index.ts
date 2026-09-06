@@ -4,6 +4,7 @@ import type {
   ComponentPart,
   SocketZone,
   CablePath,
+  MotherboardDataFlow,
   AssemblyStep,
   FrontPanelPin,
   DiagnosticCase,
@@ -18,6 +19,8 @@ import { enAssemblySteps, enDiagnosticCases } from './en/assembly';
 import { zhAssemblySteps, zhDiagnosticCases } from './zh/assembly';
 import { enCables, enFrontPanelPins } from './en/wiring';
 import { zhCables, zhFrontPanelPins } from './zh/wiring';
+import { enBoardFlows } from './en/boardFlows';
+import { zhBoardFlows } from './zh/boardFlows';
 import { enBoardZones } from './en/board';
 import { zhBoardZones } from './zh/board';
 import { enUI } from './en/ui';
@@ -73,16 +76,24 @@ const baseMotherboardZones: Array<{
 // Structural metadata for cable routes (SVG path coordinates & colors)
 const baseCablePaths: Array<{
   id: string;
+  category: 'power' | 'data';
   partId: PartId;
   color: string;
   svgPath: string;
 }> = [
-  { id: 'cable_atx24', partId: 'motherboard', color: '#facc15', svgPath: 'M 550,820 C 650,750 670,450 630,300' },
-  { id: 'cable_eps8', partId: 'cpu', color: '#f97316', svgPath: 'M 250,840 C 100,750 60,300 160,65' },
-  { id: 'cable_pcie8', partId: 'gpu', color: '#a855f7', svgPath: 'M 350,840 C 380,680 400,520 370,450' },
-  { id: 'cable_12vhpwr', partId: 'gpu', color: '#c084fc', svgPath: 'M 400,840 C 420,670 410,510 390,450' },
-  { id: 'cable_front_panel', partId: 'case_fans', color: '#06b6d4', svgPath: 'M 600,850 C 620,830 610,800 580,785' },
-  { id: 'cable_sata', partId: 'ssd', color: '#eab308', svgPath: 'M 500,840 C 580,720 620,620 625,520' }
+  // --- Power Delivery Cables (From PSU) ---
+  { id: 'cable_atx24', category: 'power', partId: 'motherboard', color: '#facc15', svgPath: 'M 340,388 C 450,388 605,330 605,220 C 605,170 595,160 575,160' },
+  { id: 'cable_eps8', category: 'power', partId: 'cpu', color: '#f97316', svgPath: 'M 340,404 C 200,404 75,410 75,320 L 75,115 C 75,90 120,90 162,90' },
+  { id: 'cable_pcie8', category: 'power', partId: 'gpu', color: '#a855f7', svgPath: 'M 340,419 C 420,419 487,310 487,181' },
+  { id: 'cable_12vhpwr', category: 'power', partId: 'gpu', color: '#c084fc', svgPath: 'M 340,419 C 400,419 465,330 487,240 L 487,181' },
+  { id: 'cable_sata_pwr', category: 'power', partId: 'ssd', color: '#f59e0b', svgPath: 'M 340,433 C 365,433 385,410 406,410' },
+
+  // --- Data & Signal Cables (To Motherboard) ---
+  { id: 'cable_sata_data', category: 'data', partId: 'ssd', color: '#06b6d4', svgPath: 'M 560,252 C 510,252 406,330 406,393' },
+  { id: 'cable_front_panel', category: 'data', partId: 'case_fans', color: '#38bdf8', svgPath: 'M 620,90 C 610,180 595,270 575,305 C 568,313 558,317 550,317' },
+  { id: 'cable_usb3', category: 'data', partId: 'case_fans', color: '#10b981', svgPath: 'M 620,130 C 610,200 590,260 560,290' },
+  { id: 'cable_hd_audio', category: 'data', partId: 'case_fans', color: '#ec4899', svgPath: 'M 620,150 C 610,360 250,350 160,325' },
+  { id: 'cable_wifi_antenna', category: 'data', partId: 'motherboard', color: '#0ea5e9', svgPath: 'M 148,139 L 120,139 C 95,139 75,100 75,64' }
 ];
 
 // Base step to socket mapping for assembly simulator
@@ -181,6 +192,13 @@ export function getCableRoutes(lang: Language): CablePath[] {
       gotcha: text.gotcha
     };
   });
+}
+
+/**
+ * Returns localized motherboard internal data highways.
+ */
+export function getMotherboardFlows(lang: Language): MotherboardDataFlow[] {
+  return lang === 'zh' ? zhBoardFlows : enBoardFlows;
 }
 
 /**

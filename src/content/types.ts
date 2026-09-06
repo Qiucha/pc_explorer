@@ -56,6 +56,7 @@ export interface DiagnosticCaseTextContent {
 export interface CableTextContent {
   id: string;
   name: string;
+  category?: 'power' | 'data';
   fromName: string;
   toName: string;
   voltage: string;
@@ -142,7 +143,30 @@ export interface UITextContent {
   wiring: {
     title: string;
     subtitle: string;
+    powerTab: string;
+    dataTab: string;
+    boardDataTab: string;
+    powerSubtitle: string;
+    dataSubtitle: string;
+    boardDataSubtitle: string;
+    powerRule: string;
+    dataRule: string;
+    boardDataRule: string;
+    psuRailsGuide: string;
+    psuRailsHint: string;
+    dataIntegrityTitle: string;
+    dataIntegrityDesc: string;
+    directVsChipsetTitle: string;
+    directVsChipsetHint: string;
+    directCpuBadge: string;
+    chipsetRoutedBadge: string;
+    busProtocol: string;
+    bandwidthLabel: string;
+    latencyLabel: string;
+    whyItMatters: string;
+    flowProfile: string;
     selectCable: string;
+    selectFlow: string;
     from: string;
     to: string;
     voltage: string;

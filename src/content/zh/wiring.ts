@@ -54,12 +54,68 @@ export const zhCables: Record<string, CableTextContent> = {
   cable_sata: {
     id: 'cable_sata',
     name: 'SATA 資料傳輸與電源線組 (L型防呆介面)',
+    category: 'power',
     fromName: '主機板 SATA 埠與電源供應器 SATA 供電端',
     toName: '2.5 吋 SATA 固態硬碟 (SSD) / 3.5 吋傳統機械硬碟 (HDD)',
     voltage: '+12V、+5V、+3.3V (供電) / 6Gbps 高速差分訊號 (資料傳輸)',
     pinCount: '7 針資料線 + 15 針扁平電源線',
     keyingRule: 'SATA 資料線與電源線接頭內部均具備顯著的「L 型」幾何防呆凹槽，防止反向或歪斜插入。',
     gotcha: 'SATA 儲存裝置必須同時接妥「兩條」線材方能正常運作：一條由電源供應器拉出的 15-Pin 扁平電源線供電，另一條由主機板引出的 7-Pin 扁平資料線傳輸（拔出資料線時切記按壓金屬彈片以防扯壞插座）。'
+  },
+  cable_sata_pwr: {
+    id: 'cable_sata_pwr',
+    name: '15-Pin SATA 儲存裝置專用電源供電線',
+    category: 'power',
+    fromName: '電源供應器 (PSU)',
+    toName: '2.5 吋 SATA SSD / 3.5 吋 HDD (15-Pin 電源插槽)',
+    voltage: '+12V (馬達驅動)、+5V (控制晶片邏輯)、+3.3V DC',
+    pinCount: '15 針 (寬型扁平一字刀片接頭)',
+    keyingRule: '較寬的 L 型偏置防呆槽口，從機械結構上徹底杜絕倒插。',
+    gotcha: '【關鍵觀念・純供電不含資料】此線材「僅負責提供直流電力」，絕不傳輸任何資料！若只接此電源線而未插 7-Pin SATA 資料線，BIOS 與系統將完全找不到該硬碟。'
+  },
+  cable_sata_data: {
+    id: 'cable_sata_data',
+    name: '7-Pin SATA 6Gbps 高速資料傳輸線',
+    category: 'data',
+    fromName: '主機板 SATA 晶片組控制器',
+    toName: '2.5 吋 SATA SSD / 3.5 吋 HDD (7-Pin 資料連接埠)',
+    voltage: '0.5V 高速差分資料訊號 (無高壓大電流)',
+    pinCount: '7 針 (配備金屬鎖扣彈片的窄版扁線)',
+    keyingRule: '較窄的 L 型槽口，插頭兩端均帶有金屬鎖扣彈片，插入插座時會清脆鎖定。',
+    gotcha: '【插主機板・非電源線】此線連接於主機板與硬碟之間，傳輸速率最高 6Gbps。拔除線材時切記先按壓接頭上的「金屬彈片」再拔出，切勿生拉硬拽，否則極易將主機板上的塑膠座整塊扯下！'
+  },
+  cable_usb3: {
+    id: 'cable_usb3',
+    name: '機殼前面板 USB 3.0 / 3.2 Gen 1 (19-Pin) 高速傳輸線',
+    category: 'data',
+    fromName: '機殼前面板 USB-A 高速傳輸埠',
+    toName: '主機板 USB 3.0 內接 19-Pin 排針座',
+    voltage: '5V 匯流排電力 + 5Gbps 雙通道差分資料',
+    pinCount: '19 針 (20 針規格陣列，其中第 20 針為防呆盲孔)',
+    keyingRule: '外殼側邊凸起防呆導軌，配合單一盲孔設計，確保方向唯一。',
+    gotcha: '【新手最大斷針陷阱】此 19 根細針極為脆弱容易歪斜！對齊側邊凸起導軌後「垂直平穩下壓」，切勿在斜角狀態左右暴力搖晃，否則針腳一旦歪折插斷將導致前面板 USB 永久失效。'
+  },
+  cable_hd_audio: {
+    id: 'cable_hd_audio',
+    name: '機殼前面板 HD Audio 高傳真音訊傳輸線 (10-1 Pin)',
+    category: 'data',
+    fromName: '機殼前面板 3.5mm 耳機與麥克風插孔',
+    toName: '主機板 AAFP 前面板音訊排針 (通常位於左下角音效晶片旁)',
+    voltage: '類比音訊微弱訊號 + 3.3V 插孔偵測邏輯',
+    pinCount: '9 針 (10-1 Pin 杜邦接頭，第 8 針為防呆盲孔)',
+    keyingRule: '第 8 號針腳位置為封閉實心盲孔，與第 9 號盲孔的 USB 2.0 排針形成物理互斥。',
+    gotcha: '【切勿插錯 USB 2.0】外觀極像 9-Pin USB 2.0！請仔細觀察盲孔位置：HD Audio 堵住的是第 8 針，USB 2.0 堵住的是第 9 針。必須插在主機板左下角標註「AAFP」或「HD_AUDIO」的插座上。'
+  },
+  cable_wifi_antenna: {
+    id: 'cable_wifi_antenna',
+    name: 'Wi-Fi 6E/7 & 藍牙高增益天線 (RP-SMA 雙頻同軸線)',
+    category: 'data',
+    fromName: '主機板 Wi-Fi/藍牙 M.2 模組 (經由後置 RP-SMA 鍍金埠)',
+    toName: '磁吸式桌面天線底座 / 全向性高增益天線棒',
+    voltage: '2.4GHz / 5GHz / 6GHz 射頻高頻微波訊號 (純無線電無直流電)',
+    pinCount: '雙路鍍金同軸 RP-SMA 接口 (內孔母座 + 外螺紋金屬屏蔽套筒)',
+    keyingRule: '反極性 RP-SMA 螺紋旋鈕（主機板側為帶螺紋的內孔母頭，天線端為內針螺帽公頭）。順時針徒手旋緊即可，切勿使用工具過度用力。',
+    gotcha: '【新手最高頻踩坑・藍牙斷斷續續＆Wi-Fi 只有一格】很多新手抱怨「電腦內建藍牙音質斷續、距離不到 1 公尺就斷線，Wi-Fi 訊號只有 1 格」，原因在於電腦金屬機殼形成了法拉第籠（完全屏蔽無線電磁波）！主機板上的 Wi-Fi 晶片與藍牙是共用後方這組天線的！哪怕你只打算用藍牙耳機或手把，也必須將這組外接天線鎖好！'
   }
 };
 
