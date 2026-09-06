@@ -1,14 +1,10 @@
-import { en } from './en';
-import { zh } from './zh';
+import { getUI } from '../content';
 import type { Language } from '../types';
+import type { UITextContent } from '../content/types';
 
-export const dictionaries = {
-  en,
-  zh
-};
-
-export type TranslationKeys = typeof en;
+export type TranslationKeys = UITextContent;
 
 export function getTranslation(lang: Language): TranslationKeys {
-  return dictionaries[lang] || dictionaries.en;
+  return getUI(lang);
 }
+

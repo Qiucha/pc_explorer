@@ -104,3 +104,23 @@ export interface AssemblyStep {
     consequence: string;
   };
 }
+
+export interface FrontPanelPin {
+  pinNumber: number;
+  label: string;
+  name: string;
+  type: 'switch' | 'led' | 'empty' | 'ground';
+  polarity?: '+' | '-';
+  row: 'top' | 'bottom';
+  description: string;
+}
+
+export interface DiagnosticCase {
+  id: string;
+  symptom: string;
+  cause: string;
+  solution: string;
+  component: string;
+  severity: 'fatal' | 'performance' | 'no-boot';
+}
+
