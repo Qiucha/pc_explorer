@@ -1,4 +1,5 @@
 # PC Explorer (Interactive Hardware Learning Platform)
+> Whole project built with antigravity with gemini-flash-3.8-high.
 
 An interactive, visual learning platform designed to demystify computer hardware, motherboard anatomy, cabling schematics, and PC assembly through responsive 2.5D graphics and multi-metaphor pedagogical models.
 
